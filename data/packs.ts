@@ -1,0 +1,193 @@
+import type { Pack } from '@/types'
+
+export const PACKS: Pack[] = [
+  {
+    id: 'longevidad',
+    slug: 'longevidad',
+    name: 'LONGEVIDAD',
+    tagline: 'Tu biología no tiene por qué envejecer al ritmo del mundo.',
+    description: 'Protección celular a largo plazo para los que piensan en décadas, no en semanas.',
+    benefitMain: 'Antioxidantes de alta potencia para el mantenimiento de la función celular normal.',
+    benefits: [
+      'Niacinamida (B3) como nutriente de soporte en rutas metabólicas celulares',
+      'Resveratrol y quercetina para la protección frente al estrés oxidativo',
+      'D3 + K2 para salud ósea y cardiovascular sostenida',
+    ],
+    audience: 'Pensás en el largo plazo. Querés envejecer diferente. Invertís en tu capital biológico.',
+    ingredients: [
+      { name: 'Niacinamida (B3)', dose: '500 mg', role: 'Metabolismo energético celular' },
+      { name: 'Resveratrol', dose: '150 mg', role: 'Antioxidante polifenólico' },
+      { name: 'Quercetina', dose: '250 mg', role: 'Antioxidante flavonoide' },
+      { name: 'Astaxantina', dose: '4 mg', role: 'Antioxidante carotenoides' },
+      { name: 'Vitamina D3 + K2 (MK7)', dose: '2000 UI / 90 mcg', role: 'Salud ósea y cardiovascular' },
+    ],
+    price: 2200000,
+    featured: false,
+    icon: '🌿',
+    colorVar: 'rgba(201,169,110,0.10)',
+    order: 1,
+  },
+  {
+    id: 'energia',
+    slug: 'energia',
+    name: 'ENERGÍA',
+    tagline: 'Energía metabólica real. Sin estimulantes. Desde el núcleo celular.',
+    description: 'Energía celular sostenida para días largos y decisiones críticas.',
+    benefitMain: 'CoQ10 y complejo B completo para el normal metabolismo energético.',
+    benefits: [
+      'CoQ10 para el metabolismo energético a nivel mitocondrial',
+      'Complejo B completo a dosis activas — no decorativas',
+      'Rhodiola Rosea y Vitamina C para resistencia al estrés y reducción de la fatiga',
+    ],
+    audience: 'Días largos, muchas decisiones, poco margen de error. Necesitás energía constante.',
+    ingredients: [
+      { name: 'CoQ10 (Ubiquinona)', dose: '100 mg', role: 'Metabolismo energético' },
+      { name: 'Complejo B (B1, B2, B3, B5, B6, B12, Folato)', dose: 'Dosis activas', role: 'Energía y sistema nervioso' },
+      { name: 'Magnesio glicinato', dose: '200 mg', role: 'Cofactor enzimático' },
+      { name: 'Rhodiola Rosea (3% rosavinas)', dose: '200 mg', role: 'Adaptógeno anti-fatiga' },
+      { name: 'Vitamina C', dose: '500 mg', role: 'Antioxidante y soporte suprarrenal' },
+    ],
+    price: 2000000,
+    featured: true,
+    icon: '⚡',
+    colorVar: 'rgba(76,186,122,0.12)',
+    order: 2,
+  },
+  {
+    id: 'cerebro',
+    slug: 'cerebro',
+    name: 'CEREBRO',
+    tagline: 'Claridad mental, foco sostenido y memoria nítida.',
+    description: 'Stack nootrópico legal para rendimiento cognitivo de alto nivel.',
+    benefitMain: 'Lion\'s Mane y Bacopa para el normal funcionamiento cognitivo y la memoria.',
+    benefits: [
+      'Lion\'s Mane como soporte del sistema nervioso y función cognitiva',
+      'Bacopa Monnieri estandarizado para memoria y aprendizaje',
+      'Fosfatidilserina + L-Teanina para integridad neuronal y foco sin ansiedad',
+    ],
+    audience: 'Tu capital más valioso es lo que pensás. Aprendizaje continuo, producción intelectual.',
+    ingredients: [
+      { name: 'Lion\'s Mane (Hericium erinaceus)', dose: '500 mg', role: 'Función cognitiva' },
+      { name: 'Bacopa Monnieri (50% bacosides)', dose: '300 mg', role: 'Memoria y aprendizaje' },
+      { name: 'Fosfatidilserina', dose: '100 mg', role: 'Integridad de membrana neuronal' },
+      { name: 'L-Teanina', dose: '200 mg', role: 'Foco sin ansiedad' },
+    ],
+    price: 2400000,
+    featured: false,
+    icon: '🧠',
+    colorVar: 'rgba(100,140,255,0.08)',
+    order: 3,
+  },
+  {
+    id: 'fisico',
+    slug: 'fisico',
+    name: 'FÍSICO',
+    tagline: 'Rendimiento, recuperación y estructura.',
+    description: 'El stack que debería tener cualquier hombre activo. Sin más, sin menos.',
+    benefitMain: 'Creatina, colágeno y micronutrientes para rendimiento y recuperación real.',
+    benefits: [
+      'Creatina Monohidrato — el suplemento más estudiado de la historia',
+      'Colágeno hidrolizado para articulaciones y tejido conectivo',
+      'Magnesio glicinato + D3 para función muscular y recuperación',
+    ],
+    audience: 'Entrenás con seriedad y querés ver el retorno. Rendimiento a largo plazo.',
+    ingredients: [
+      { name: 'Creatina Monohidrato', dose: '3 g', role: 'Rendimiento físico y fuerza' },
+      { name: 'Colágeno hidrolizado tipo I y III', dose: '5 g', role: 'Articulaciones y tejido conectivo' },
+      { name: 'Magnesio glicinato', dose: '200 mg', role: 'Función muscular y recuperación' },
+      { name: 'Vitamina D3', dose: '2000 UI', role: 'Función muscular' },
+      { name: 'Vitamina C', dose: '250 mg', role: 'Síntesis de colágeno' },
+    ],
+    price: 1800000,
+    featured: false,
+    icon: '💪',
+    colorVar: 'rgba(255,120,80,0.08)',
+    order: 4,
+  },
+  {
+    id: 'hormonas',
+    slug: 'hormonas',
+    name: 'HORMONAS',
+    tagline: 'El equilibrio hormonal no se crea en el gym. Se construye desde adentro.',
+    description: 'Equilibrio hormonal natural para el hombre que vive bajo presión constante.',
+    benefitMain: 'Ashwagandha KSM-66 y zinc para el normal equilibrio hormonal masculino.',
+    benefits: [
+      'Ashwagandha KSM-66 (600 mg) para la respuesta adaptativa al estrés',
+      'Zinc bisglicinato — cofactor esencial en el metabolismo hormonal',
+      'Boro + B6 (P5P) para el equilibrio mineral y hormonal fisiológico',
+    ],
+    audience: 'Fatiga sin causa, motivación baja. El estrés crónico tiene un costo hormonal real.',
+    ingredients: [
+      { name: 'Ashwagandha KSM-66', dose: '600 mg', role: 'Adaptógeno, eje suprarrenal' },
+      { name: 'Zinc bisglicinato', dose: '15 mg', role: 'Metabolismo hormonal' },
+      { name: 'Vitamina B6 (P5P)', dose: '10 mg', role: 'Metabolismo hormonal' },
+      { name: 'Boro', dose: '3 mg', role: 'Metabolismo mineral' },
+    ],
+    price: 2200000,
+    featured: false,
+    icon: '⚖️',
+    colorVar: 'rgba(180,100,255,0.07)',
+    order: 5,
+  },
+  {
+    id: 'bienestar-mental',
+    slug: 'bienestar-mental',
+    name: 'BIENESTAR MENTAL',
+    tagline: 'Un sistema nervioso en calma es tu ventaja competitiva real.',
+    description: 'Soporte del sistema nervioso para quienes no pueden apagarse.',
+    benefitMain: 'Magnesio L-treonato y azafrán para el normal funcionamiento del sistema nervioso.',
+    benefits: [
+      'Magnesio L-treonato — forma con mayor penetración al sistema nervioso',
+      'Azafrán Affron® (28 mg) con más de 20 estudios clínicos sobre bienestar emocional',
+      'L-Teanina + B6 para el normal funcionamiento del sistema nervioso',
+    ],
+    audience: 'La presión es constante. Calidad de sueño baja, tensión de fondo. Necesitás recuperar el piso.',
+    ingredients: [
+      { name: 'Magnesio L-treonato', dose: '1500 mg', role: 'Sistema nervioso central' },
+      { name: 'L-Teanina', dose: '200 mg', role: 'Relajación sin sedación' },
+      { name: 'Azafrán (Affron®)', dose: '28 mg', role: 'Bienestar emocional' },
+      { name: 'Vitamina B6 (P5P)', dose: '10 mg', role: 'Normal funcionamiento del SN' },
+    ],
+    price: 2600000,
+    featured: false,
+    icon: '🌊',
+    colorVar: 'rgba(76,186,122,0.06)',
+    order: 6,
+  },
+]
+
+export const PACK_COMBINATIONS = {
+  maxPacks: 3,
+  recommended: [
+    {
+      id: 'stack-rendimiento',
+      name: 'Stack Rendimiento',
+      packIds: ['energia', 'cerebro', 'fisico'],
+      description: 'Para el emprendedor que también entrena.',
+    },
+    {
+      id: 'stack-lider',
+      name: 'Stack Líder',
+      packIds: ['energia', 'cerebro', 'hormonas'],
+      description: 'Energía, foco y equilibrio hormonal.',
+    },
+    {
+      id: 'stack-longevidad',
+      name: 'Stack Longevidad',
+      packIds: ['longevidad', 'fisico', 'bienestar-mental'],
+      description: 'Para los que piensan en décadas.',
+    },
+  ],
+}
+
+export const getPack = (id: string): Pack | undefined =>
+  PACKS.find((p) => p.id === id || p.slug === id)
+
+export const formatARS = (cents: number): string => {
+  return new Intl.NumberFormat('es-AR', {
+    style: 'currency',
+    currency: 'ARS',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(cents / 100)
+}

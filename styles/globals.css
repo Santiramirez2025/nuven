@@ -1,0 +1,153 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── DESIGN TOKENS ──────────────────────────────────────────────────────── */
+:root {
+  --bg: #080c0a;
+  --bg-2: #0d1210;
+  --bg-3: #111915;
+  --surface: #141f1a;
+  --surface-2: #1a2820;
+  --border: rgba(255, 255, 255, 0.07);
+  --border-accent: rgba(100, 200, 140, 0.15);
+  --text: #e8ede9;
+  --text-2: #8fa898;
+  --text-3: #5a7066;
+  --accent: #4cba7a;
+  --accent-2: #3da368;
+  --accent-3: #2d8a54;
+  --accent-glow: rgba(76, 186, 122, 0.15);
+  --gold: #c9a96e;
+
+  /* Spacing scale */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --space-32: 128px;
+
+  /* Border radius */
+  --radius-sm: 8px;
+  --radius: 16px;
+  --radius-lg: 24px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-card: 0 20px 60px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 12px 40px rgba(76, 186, 122, 0.3);
+}
+
+/* ─── BASE ───────────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-dm-sans), system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.65;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ─── NOISE TEXTURE ──────────────────────────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.4;
+}
+
+/* ─── TYPOGRAPHY ─────────────────────────────────────────────────────────── */
+h1, h2, h3, h4, h5 {
+  font-family: var(--font-syne), sans-serif;
+  line-height: 1.1;
+  font-weight: 800;
+}
+
+/* ─── SCROLLBAR ──────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb {
+  background: var(--surface-2);
+  border-radius: var(--radius-full);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--accent-3); }
+
+/* ─── FOCUS VISIBLE ──────────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* ─── SELECTION ──────────────────────────────────────────────────────────── */
+::selection {
+  background: rgba(76, 186, 122, 0.25);
+  color: var(--text);
+}
+
+/* ─── UTILITIES ──────────────────────────────────────────────────────────── */
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+  .surface { background: var(--surface); }
+  .surface-2 { background: var(--surface-2); }
+  .border-default { border-color: var(--border); }
+  .border-accent { border-color: var(--border-accent); }
+  .text-nuven { color: var(--text); }
+  .text-nuven-2 { color: var(--text-2); }
+  .text-nuven-3 { color: var(--text-3); }
+  .text-accent { color: var(--accent); }
+  .text-gold { color: var(--gold); }
+}
+
+/* ─── ANIMATIONS ─────────────────────────────────────────────────────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulseDot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(1.3); }
+}
+
+@keyframes marqueeTicker {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+@keyframes fillBar {
+  from { width: 0; }
+  to   { width: 72%; }
+}
+
+.animate-marquee { animation: marqueeTicker 25s linear infinite; }
+.animate-fill-bar { animation: fillBar 2s ease both; }
+
+/* ─── MOBILE SAFE AREA ───────────────────────────────────────────────────── */
+.pb-safe { padding-bottom: env(safe-area-inset-bottom); }
