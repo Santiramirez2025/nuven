@@ -27,14 +27,28 @@ export interface MPPreferencePayload {
   }
   statement_descriptor: string
   external_reference: string
-  metadata?: Record<string, string>  // MP accepts strings only
+  metadata?: Record<string, string>
+}
+
+// Acepta ambos nombres de variable por compatibilidad
+function getAccessToken(): string {
+  const token =
+    process.env.MP_ACCESS_TOKEN ??
+    process.env.MERCADOPAGO_ACCESS_TOKEN
+
+  if (!token) {
+    throw new Error(
+      'MercadoPago access token not configured. ' +
+      'Set MP_ACCESS_TOKEN or MERCADOPAGO_ACCESS_TOKEN in environment variables.'
+    )
+  }
+  return token
 }
 
 export async function createPreference(
   payload: MPPreferencePayload
 ): Promise<{ id: string; init_point: string }> {
-  const accessToken = process.env.MP_ACCESS_TOKEN
-  if (!accessToken) throw new Error('MP_ACCESS_TOKEN not configured')
+  const accessToken = getAccessToken()
 
   const response = await fetch(
     'https://api.mercadopago.com/checkout/preferences',
@@ -72,7 +86,10 @@ export function verifyWebhookSignature(
   dataId: string
 ): boolean {
   const secret = process.env.MP_WEBHOOK_SECRET
-  if (!secret) return false
+  if (!secret) {
+    console.warn('[mercadopago] MP_WEBHOOK_SECRET not configured')
+    return false
+  }
   // TODO: implement HMAC-SHA256 verification
   // https://www.mercadopago.com.ar/developers/es/docs/your-integrations/notifications/webhooks
   return true
