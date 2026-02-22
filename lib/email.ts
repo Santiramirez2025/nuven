@@ -3,9 +3,13 @@ import { render } from '@react-email/components'
 import { OrderConfirmation } from '@/emails/OrderConfirmation'
 import type { OrderItem } from '@/types/database'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 const FROM = 'NUVEN <hola@nuven.com.ar>'
+
+function getResend() {
+  const key = process.env.RESEND_API_KEY
+  if (!key) throw new Error('[email] RESEND_API_KEY not set')
+  return new Resend(key)
+}
 
 // ─── ORDER CONFIRMATION ──────────────────────────────────────────────────────
 
@@ -17,7 +21,6 @@ export async function sendOrderConfirmation(data: {
   totalArs: number
   isSubscription: boolean
 }) {
-  // Estimate delivery: 3-7 business days
   const delivery = new Date()
   delivery.setDate(delivery.getDate() + 5)
   const estimatedDelivery = delivery.toLocaleDateString('es-AR', {
@@ -27,13 +30,10 @@ export async function sendOrderConfirmation(data: {
   })
 
   const html = await render(
-    OrderConfirmation({
-      ...data,
-      estimatedDelivery,
-    }) as React.ReactElement
+    OrderConfirmation({ ...data, estimatedDelivery }) as React.ReactElement
   )
 
-  const { error } = await resend.emails.send({
+  const { error } = await getResend().emails.send({
     from: FROM,
     to: data.to,
     subject: `✓ Tu protocolo NUVEN está en camino — Pedido #${data.orderId.slice(0, 8).toUpperCase()}`,
@@ -44,20 +44,17 @@ export async function sendOrderConfirmation(data: {
     ],
   })
 
-  if (error) {
-    console.error('[email] sendOrderConfirmation error:', error)
-    // Don't throw — email failure shouldn't break the order flow
-  }
+  if (error) console.error('[email] sendOrderConfirmation error:', error)
 }
 
-// ─── ABANDONED CART (trigger from CRON job) ──────────────────────────────────
+// ─── ABANDONED CART ──────────────────────────────────────────────────────────
 
 export async function sendAbandonedCart(data: {
   to: string
   customerName: string
   packNames: string[]
 }) {
-  const { error } = await resend.emails.send({
+  const { error } = await getResend().emails.send({
     from: FROM,
     to: data.to,
     subject: `Tu protocolo te está esperando, ${data.customerName}`,
@@ -89,7 +86,13 @@ export async function sendSubscriptionRenewal(data: {
   nextDate: string
   totalArs: number
 }) {
-  const { error } = await resend.emails.send({
+  const formatted = new Intl.NumberFormat('es-AR', {
+    style: 'currency',
+    currency: 'ARS',
+    minimumFractionDigits: 0,
+  }).format(data.totalArs / 100)
+
+  const { error } = await getResend().emails.send({
     from: FROM,
     to: data.to,
     subject: 'Tu próximo envío NUVEN está programado',
@@ -97,7 +100,7 @@ export async function sendSubscriptionRenewal(data: {
       <div style="font-family:system-ui;background:#080c0a;color:#e8ede9;padding:40px;max-width:560px;margin:0 auto">
         <h2>Tu protocolo continúa</h2>
         <p>Hola ${data.customerName}, tu próxima entrega está programada para el <strong>${data.nextDate}</strong>.</p>
-        <p>Total: <strong style="color:#4cba7a">${new Intl.NumberFormat('es-AR',{style:'currency',currency:'ARS',minimumFractionDigits:0}).format(data.totalArs/100)}</strong></p>
+        <p>Total: <strong style="color:#4cba7a">${formatted}</strong></p>
         <a href="https://nuven.com.ar/cuenta"
           style="display:inline-block;background:#141f1a;color:#e8ede9;padding:12px 24px;border-radius:100px;text-decoration:none;border:1px solid rgba(255,255,255,0.1);margin-top:16px">
           Administrar suscripción
@@ -106,5 +109,6 @@ export async function sendSubscriptionRenewal(data: {
     `,
     tags: [{ name: 'category', value: 'subscription_renewal' }],
   })
+
   if (error) console.error('[email] sendSubscriptionRenewal error:', error)
 }

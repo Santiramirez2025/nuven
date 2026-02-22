@@ -1,108 +1,128 @@
 'use client'
-import { motion } from 'framer-motion'
-import { cn } from '@/lib/utils'
+
+import { useState } from 'react'
 import { formatARS } from '@/data/packs'
 import { useCart } from '@/hooks/useCart'
-import { Button } from '@/components/ui/Button'
 import type { Pack } from '@/types'
+
+// Pack accent colors — mapped from colorVar to solid values
+const PACK_COLORS: Record<string, { solid: string; glow: string; bg: string }> = {
+  longevidad:       { solid: '#c9a96e', glow: 'rgba(201,169,110,0.12)', bg: 'rgba(201,169,110,0.06)' },
+  energia:          { solid: '#4cba7a', glow: 'rgba(76,186,122,0.15)',  bg: 'rgba(76,186,122,0.07)'  },
+  cerebro:          { solid: '#60a5fa', glow: 'rgba(96,165,250,0.12)',  bg: 'rgba(96,165,250,0.06)'  },
+  fisico:           { solid: '#f97316', glow: 'rgba(249,115,22,0.12)',  bg: 'rgba(249,115,22,0.06)'  },
+  hormonas:         { solid: '#a78bfa', glow: 'rgba(167,139,250,0.12)', bg: 'rgba(167,139,250,0.06)' },
+  'bienestar-mental': { solid: '#67e8f9', glow: 'rgba(103,232,249,0.12)', bg: 'rgba(103,232,249,0.06)' },
+}
 
 interface PackCardProps {
   pack: Pack
   index: number
+  visible: boolean
 }
 
-export function PackCard({ pack, index }: PackCardProps) {
+export function PackCard({ pack, index, visible }: PackCardProps) {
   const { addItem, items, canAddMore } = useCart()
-  const inCart = items.some((i) => i.pack.id === pack.id)
+  const inCart   = items.some((i) => i.pack.id === pack.id)
   const cartFull = !canAddMore() && !inCart
+  const [expanded, setExpanded] = useState(false)
+  const color = PACK_COLORS[pack.id] ?? PACK_COLORS['energia']
+  const shown = visible
 
   return (
-    <motion.article
-      initial={{ opacity: 0, y: 32 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.6, delay: index * 0.08 }}
-      className={cn(
-        'relative rounded-3xl border p-9 overflow-hidden',
-        'transition-all duration-350 cursor-default group',
-        'hover:border-[var(--border-accent)] hover:-translate-y-1',
-        'hover:shadow-[0_20px_60px_rgba(0,0,0,0.4)]',
-        pack.featured
-          ? 'border-[var(--border-accent)] bg-gradient-to-br from-[var(--surface)] to-[var(--surface-2)]'
-          : 'border-[var(--border)] bg-[var(--surface)]'
-      )}
-      style={{ '--pack-color': pack.colorVar } as React.CSSProperties}
-      aria-label={`Pack ${pack.name}`}
-    >
-      {/* Glow background on hover */}
-      <div
-        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-350 pointer-events-none"
-        style={{ background: `radial-gradient(circle at 80% 20%, ${pack.colorVar} 0%, transparent 60%)` }}
-      />
+    <>
+      <article
+        className={`pc ${pack.featured ? 'pc--featured' : ''} ${inCart ? 'pc--incart' : ''}`}
+        style={{
+          '--c-solid': color.solid,
+          '--c-glow':  color.glow,
+          '--c-bg':    color.bg,
+          opacity: shown ? 1 : 0,
+          transform: shown ? 'translateY(0)' : 'translateY(24px)',
+          transition: `opacity 0.55s ease ${index * 90}ms, transform 0.55s ease ${index * 90}ms`,
+        } as React.CSSProperties}
+        aria-label={`Pack ${pack.name}`}
+      >
+        {/* Top accent line */}
+        <div className="pc-accent-line" />
 
-      {/* Featured badge */}
-      {pack.featured && (
-        <span className="absolute top-5 right-5 bg-accent text-black text-[11px] font-bold font-syne tracking-wide px-3 py-1 rounded-full uppercase">
-          Más popular
-        </span>
-      )}
+        {/* Featured badge */}
+        {pack.featured && (
+          <span className="pc-badge">Más popular</span>
+        )}
 
-      {/* Header */}
-      <p className="text-[11px] font-bold tracking-[0.12em] uppercase text-[var(--text-3)] mb-5">
-        Pack {String(pack.order).padStart(2, '0')}
-      </p>
+        {/* Glow bg on hover */}
+        <div className="pc-glow" aria-hidden="true" />
 
-      <div className="w-14 h-14 rounded-2xl bg-[var(--bg)] border border-[var(--border)] flex items-center justify-center text-2xl mb-6 transition-colors group-hover:border-[var(--border-accent)]">
-        {pack.icon}
-      </div>
-
-      <h3 className="font-syne text-[28px] font-black tracking-tight mb-2">
-        {pack.name}
-      </h3>
-
-      <p className="text-sm text-accent font-medium mb-5 leading-snug">
-        {pack.benefitMain}
-      </p>
-
-      {/* Benefits */}
-      <ul className="space-y-2.5 mb-6" role="list">
-        {pack.benefits.map((benefit, i) => (
-          <li key={i} className="flex items-start gap-2.5 text-sm text-[var(--text-2)] leading-snug">
-            <span className="text-accent mt-0.5 flex-shrink-0">—</span>
-            {benefit}
-          </li>
-        ))}
-      </ul>
-
-      {/* Audience */}
-      <div className="py-3 border-t border-[var(--border)] mb-6">
-        <p className="text-[13px] text-[var(--text-3)]">
-          <strong className="text-[var(--text-2)]">Para vos si:</strong> {pack.audience}
-        </p>
-      </div>
-
-      {/* CTA */}
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="font-syne text-[22px] font-black">
-            {formatARS(pack.price)}
-            <span className="text-[13px] font-normal text-[var(--text-3)] ml-1">/ unidad</span>
-          </p>
-          <p className="text-[12px] text-[var(--text-3)] mt-0.5">
-            Envío incluido · Pago único
-          </p>
+        {/* ── Header ── */}
+        <div className="pc-header">
+          <span className="pc-order">
+            {String(pack.order).padStart(2, '0')}
+          </span>
+          <h3 className="pc-name">{pack.name}</h3>
+          <p className="pc-tagline">{pack.benefitMain}</p>
         </div>
 
-        <Button
-          variant={inCart ? 'ghost' : 'outline'}
-          size="sm"
-          disabled={cartFull}
-          onClick={() => addItem(pack)}
-          aria-label={inCart ? `${pack.name} ya en carrito` : `Agregar ${pack.name} al carrito`}
+        {/* ── Ingredients pills ── */}
+        <div className="pc-ingredients">
+          {pack.ingredients.map((ing) => (
+            <div key={ing.name} className="pc-ing">
+              <span className="pc-ing-dose">{ing.dose}</span>
+              <span className="pc-ing-name">{ing.name.split(' (')[0]}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* ── Audience ── */}
+        <button
+          className="pc-audience"
+          onClick={() => setExpanded((v) => !v)}
+          aria-expanded={expanded}
         >
-          {inCart ? '✓ En carrito' : cartFull ? 'Máx. 3' : 'Agregar →'}
-        </Button>
-      </div>
-    </motion.article>
+          <span className="pc-audience-label">Para vos si</span>
+          <span className="pc-audience-chevron" aria-hidden="true">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none"
+              stroke="currentColor" strokeWidth="2.5">
+              <path d="M6 9l6 6 6-6" />
+            </svg>
+          </span>
+        </button>
+
+        <div className="pc-audience-body-wrap">
+          <div className="pc-audience-body-inner">
+            <p className="pc-audience-text">{pack.audience}</p>
+          </div>
+        </div>
+
+        {/* ── Footer ── */}
+        <div className="pc-footer">
+          <div className="pc-price-block">
+            <span className="pc-price">{formatARS(pack.price)}</span>
+            <span className="pc-price-sub">por unidad · envío incluido</span>
+          </div>
+
+          <button
+            className={`pc-cta ${inCart ? 'pc-cta--incart' : ''} ${cartFull ? 'pc-cta--disabled' : ''}`}
+            disabled={cartFull}
+            onClick={() => !inCart && addItem(pack)}
+            aria-label={
+              inCart    ? `${pack.name} ya en carrito` :
+              cartFull  ? 'Máximo 3 packs' :
+                          `Agregar ${pack.name} al carrito`
+            }
+          >
+            {inCart ? (
+              <>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                  stroke="currentColor" strokeWidth="3" aria-hidden="true">
+                  <path d="M5 12l5 5L20 7" />
+                </svg>
+                En carrito
+              </>
+            ) : cartFull ? 'Máx. 3' : 'Agregar'}
+          </button>
+        </div>
+      </article>
+    </>
   )
 }

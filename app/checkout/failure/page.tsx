@@ -11,12 +11,8 @@ export default function FailurePage() {
             No se realizó ningún cargo. Podés intentarlo nuevamente con otro medio de pago.
           </p>
           <div className="flex gap-3 justify-center flex-wrap">
-            <Button asChild>
-              <a href="/checkout">Intentar nuevamente →</a>
-            </Button>
-            <Button variant="secondary" asChild>
-              <a href="/">Volver al inicio</a>
-            </Button>
+            <Button href="/checkout">Intentar nuevamente →</Button>
+            <Button variant="secondary" href="/">Volver al inicio</Button>
           </div>
         </div>
       </div>

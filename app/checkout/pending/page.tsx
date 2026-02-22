@@ -13,9 +13,7 @@ export default function PendingPage() {
           <p className="text-sm text-[var(--text-3)] mb-8">
             Esto puede demorar hasta 2 días hábiles dependiendo del método de pago.
           </p>
-          <Button asChild>
-            <a href="/">Volver al inicio</a>
-          </Button>
+          <Button href="/">Volver al inicio</Button>
         </div>
       </div>
     </div>

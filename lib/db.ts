@@ -75,6 +75,15 @@ export async function getCustomerByEmail(email: string): Promise<Customer | null
   return (rows[0] as Customer) ?? null
 }
 
+export async function getCustomerById(id: string): Promise<Customer | null> {
+  const rows = await sql`
+    SELECT * FROM customers
+    WHERE id = ${id}
+    LIMIT 1
+  `
+  return (rows[0] as Customer) ?? null
+}
+
 // ─── ORDERS ──────────────────────────────────────────────────────────────────
 
 export async function createOrder(data: {
@@ -128,9 +137,9 @@ export async function updateOrderStatus(
 ): Promise<void> {
   await sql`
     UPDATE orders SET
-      status     = ${status},
+      status        = ${status},
       mp_payment_id = COALESCE(${mpPaymentId ?? null}, mp_payment_id),
-      updated_at = now()
+      updated_at    = now()
     WHERE mp_external_reference = ${mpExternalReference}
   `
 }
@@ -164,9 +173,9 @@ export async function updateCustomerStats(
 ): Promise<void> {
   await sql`
     UPDATE customers SET
-      total_orders     = total_orders + 1,
-      total_spent_ars  = total_spent_ars + ${totalArs},
-      updated_at       = now()
+      total_orders    = total_orders + 1,
+      total_spent_ars = total_spent_ars + ${totalArs},
+      updated_at      = now()
     WHERE id = ${customerId}
   `
 }

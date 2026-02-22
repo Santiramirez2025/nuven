@@ -46,12 +46,8 @@ function SuccessContent() {
           </div>
 
           <div className="flex gap-3 justify-center flex-wrap">
-            <Button asChild>
-              <a href="/">Volver al inicio</a>
-            </Button>
-            <Button variant="secondary" asChild>
-              <a href="mailto:hola@nuven.com.ar">Contactar soporte</a>
-            </Button>
+            <Button href="/">Volver al inicio</Button>
+            <Button variant="secondary" href="mailto:hola@nuven.com.ar">Contactar soporte</Button>
           </div>
         </div>
       </div>

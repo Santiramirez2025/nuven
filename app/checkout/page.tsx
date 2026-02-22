@@ -100,7 +100,7 @@ export default function CheckoutPage() {
           <p className="text-6xl mb-6">🧬</p>
           <h1 className="font-syne text-3xl font-black mb-4">Tu protocolo está vacío</h1>
           <p className="text-[var(--text-2)] mb-8">Elegí tus packs primero.</p>
-          <Button asChild><a href="/#packs">Ver packs</a></Button>
+          <Button href="/#packs">Ver packs</Button>
         </div>
       </div>
     )
