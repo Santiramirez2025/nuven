@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
       shippingAddress?: ShippingAddress
     }
 
-    // ── Validate ────────────────────────────────────────────────────────────
+    // ── Validate ─────────────────────────────────────────────────────────────
     if (!items?.length) {
       return NextResponse.json({ error: 'No items in cart' }, { status: 400 })
     }
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Customer data required' }, { status: 400 })
     }
 
-    // ── Business logic ───────────────────────────────────────────────────────
+    // ── Business logic ────────────────────────────────────────────────────────
     const subtotalArs = items.reduce((acc, i) => acc + i.pack.price * i.quantity, 0)
     const shippingArs = 0
     const discountArs = 0
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
     const externalRef = `nuven_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`
     const origin = req.headers.get('origin') ?? 'https://nuven.com.ar'
 
-    // ── Upsert customer ──────────────────────────────────────────────────────
+    // ── Upsert customer ───────────────────────────────────────────────────────
     const dbCustomer = await upsertCustomer({
       email: customer.email.toLowerCase(),
       first_name: customer.firstName,
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
       phone: customer.phone,
     })
 
-    // ── Create order ─────────────────────────────────────────────────────────
+    // ── Create order ──────────────────────────────────────────────────────────
     const orderItems: OrderItem[] = items.map((i) => ({
       pack_id: i.pack.id,
       pack_name: i.pack.name,
@@ -67,23 +67,35 @@ export async function POST(req: NextRequest) {
       shipping_address: shippingAddress,
     })
 
-    // ── Create MercadoPago preference ────────────────────────────────────────
+    // ── Build payer object safely ─────────────────────────────────────────────
+    const payer: {
+      name: string
+      email: string
+      phone?: { area_code: string; number: string }
+    } = {
+      name: `${customer.firstName} ${customer.lastName}`,
+      email: customer.email.toLowerCase(),
+    }
+
+    // Only add phone if it exists and has actual digits
+    if (customer.phone && customer.phone.trim().length > 0) {
+      const digitsOnly = customer.phone.replace(/\D/g, '')
+      if (digitsOnly.length >= 6) {
+        payer.phone = { area_code: '54', number: digitsOnly }
+      }
+    }
+
+    // ── Create MercadoPago preference ─────────────────────────────────────────
     const preference = await createPreference({
       items: items.map((item) => ({
         id: item.pack.id,
         title: `NUVEN ${item.pack.name}`,
-        description: item.pack.tagline,
+        description: item.pack.tagline ?? item.pack.name,
         quantity: item.quantity,
-        unit_price: item.pack.price / 100,
+        unit_price: item.pack.price,   // ARS, already full value (not cents)
         currency_id: 'ARS',
       })),
-      payer: {
-        name: `${customer.firstName} ${customer.lastName}`,
-        email: customer.email,
-        ...(customer.phone && {
-          phone: { area_code: '54', number: customer.phone },
-        }),
-      },
+      payer,
       back_urls: {
         success: `${origin}/checkout/success?ref=${externalRef}`,
         failure: `${origin}/checkout/failure?ref=${externalRef}`,
@@ -94,13 +106,13 @@ export async function POST(req: NextRequest) {
       external_reference: externalRef,
       payment_methods: { installments: 6 },
       metadata: {
-        order_id: order.id,
-        customer_id: dbCustomer.id,
+        order_id: String(order.id),
+        customer_id: String(dbCustomer.id),
         packs: items.map((i) => i.pack.id).join(','),
       },
     })
 
-    // ── Save preference ID ───────────────────────────────────────────────────
+    // ── Save preference ID ────────────────────────────────────────────────────
     await updateOrderPreferenceId(order.id, preference.id!)
 
     return NextResponse.json({
@@ -110,9 +122,8 @@ export async function POST(req: NextRequest) {
     })
   } catch (error) {
     console.error('[checkout] error:', error)
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal server error' },
-      { status: 500 }
-    )
+    // Return the actual error message to help debug
+    const message = error instanceof Error ? error.message : 'Internal server error'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
