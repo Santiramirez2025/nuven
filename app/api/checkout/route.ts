@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
         title: `NUVEN ${item.pack.name}`,
         description: item.pack.tagline ?? item.pack.name,
         quantity: item.quantity,
-        unit_price: item.pack.price,   // ARS, already full value (not cents)
+        unit_price: item.pack.price / 100,  // convert cents → ARS
         currency_id: 'ARS',
       })),
       payer,
