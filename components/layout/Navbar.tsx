@@ -20,6 +20,7 @@ export function Navbar() {
   const count = totalItems()
   const prevCount = useRef(count)
 
+  // Cart pulse on item change
   useEffect(() => {
     if (count !== prevCount.current) {
       setCartPulse(true)
@@ -29,26 +30,32 @@ export function Navbar() {
     }
   }, [count])
 
+  // Scroll: progress bar + active section detection
   useEffect(() => {
     const onScroll = () => {
       const y = window.scrollY
       setScrolled(y > 60)
+
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight
       setScrollProgress(maxScroll > 0 ? (y / maxScroll) * 100 : 0)
 
-      for (const { href } of [...NAV_LINKS].reverse()) {
+      // Active section: last section whose top is above half the viewport
+      let current = ''
+      for (const { href } of NAV_LINKS) {
         const el = document.querySelector(href)
-        if (el && el.getBoundingClientRect().top <= 120) {
-          setActiveLink(href)
-          return
+        if (!el) continue
+        if (el.getBoundingClientRect().top <= window.innerHeight / 2) {
+          current = href
         }
       }
-      setActiveLink('')
+      setActiveLink(current)
     }
+
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
+  // Lock body scroll when mobile menu is open
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
@@ -56,7 +63,6 @@ export function Navbar() {
 
   return (
     <>
-      {/* Main Header */}
       <header
         className={cn(
           'fixed top-0 left-0 right-0 z-30 transition-all duration-500',
@@ -65,9 +71,8 @@ export function Navbar() {
             : 'bg-transparent'
         )}
       >
-        {/* Scroll progress bar */}
         <div
-          className="absolute bottom-0 left-0 h-[1.5px] bg-accent transition-all duration-100 ease-out"
+          className="absolute bottom-0 left-0 h-[1.5px] bg-accent transition-[width] duration-100 ease-out"
           style={{ width: `${scrollProgress}%`, opacity: scrolled ? 1 : 0 }}
           aria-hidden="true"
         />
@@ -76,8 +81,6 @@ export function Navbar() {
           'max-w-7xl mx-auto flex items-center justify-between px-6 md:px-10 transition-all duration-300',
           scrolled ? 'py-3' : 'py-5'
         )}>
-
-          {/* Logo */}
           <a
             href="/"
             className="relative font-syne text-xl font-black tracking-widest group"
@@ -89,12 +92,12 @@ export function Navbar() {
             <span className="absolute -bottom-0.5 left-0 w-0 h-px bg-accent transition-all duration-300 group-hover:w-full" />
           </a>
 
-          {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-1" role="navigation">
             {NAV_LINKS.map(({ href, label }) => (
               <a
                 key={href}
                 href={href}
+                onClick={() => setActiveLink(href)}
                 className={cn(
                   'relative px-4 py-2 text-sm font-medium rounded-full transition-all duration-200',
                   activeLink === href
@@ -110,9 +113,7 @@ export function Navbar() {
             ))}
           </nav>
 
-          {/* Right actions */}
           <div className="flex items-center gap-3">
-            {/* Cart button desktop */}
             <button
               onClick={toggleCart}
               className={cn(
@@ -138,11 +139,10 @@ export function Navbar() {
               )}
             </button>
 
-            {/* Cart button mobile */}
             <button
               onClick={toggleCart}
               className="md:hidden relative w-10 h-10 flex items-center justify-center rounded-full border border-[var(--border)] bg-[var(--surface)]"
-              aria-label={`Carrito, ${count} productos`}
+              aria-label={`Carrito, ${count} producto${count !== 1 ? 's' : ''}`}
             >
               <svg width="16" height="16" viewBox="0 0 15 15" fill="none" className="text-accent">
                 <path d="M1 1h2l1.5 7h7l1.5-7H13" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -156,7 +156,6 @@ export function Navbar() {
               )}
             </button>
 
-            {/* Hamburger */}
             <button
               onClick={() => setMobileOpen(v => !v)}
               className="md:hidden w-10 h-10 flex flex-col items-center justify-center gap-[5px] rounded-full border border-[var(--border)] bg-[var(--surface)]"
@@ -171,38 +170,52 @@ export function Navbar() {
         </div>
       </header>
 
-      {/* Mobile Menu */}
       <div
         className={cn(
-          'fixed inset-0 z-20 md:hidden transition-all duration-400',
+          'fixed inset-0 z-20 md:hidden',
           mobileOpen ? 'pointer-events-auto' : 'pointer-events-none'
         )}
       >
         <div
-          className={cn('absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity duration-300', mobileOpen ? 'opacity-100' : 'opacity-0')}
+          className={cn(
+            'absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity duration-300',
+            mobileOpen ? 'opacity-100' : 'opacity-0'
+          )}
           onClick={() => setMobileOpen(false)}
         />
 
         <nav
           className={cn(
-            'absolute top-0 right-0 h-full w-72 bg-[var(--bg-3)] border-l border-[var(--border)] flex flex-col pt-24 pb-10 px-8 transition-transform duration-400 ease-[cubic-bezier(0.32,0.72,0,1)]',
+            'absolute top-0 right-0 h-full w-72 bg-[var(--bg-3)] border-l border-[var(--border)] flex flex-col pt-24 pb-10 px-8',
+            'transition-transform duration-[400ms] ease-[cubic-bezier(0.32,0.72,0,1)]',
             mobileOpen ? 'translate-x-0' : 'translate-x-full'
           )}
         >
-          <p className="text-[10px] tracking-[0.2em] text-[var(--text-3)] uppercase mb-8 font-medium">Navegar</p>
+          <p className="text-[10px] tracking-[0.2em] text-[var(--text-3)] uppercase mb-8 font-medium">
+            Navegar
+          </p>
+
           <ul className="space-y-1 flex-1">
             {NAV_LINKS.map(({ href, label }, i) => (
               <li
                 key={href}
                 style={{ transitionDelay: mobileOpen ? `${i * 50 + 100}ms` : '0ms' }}
-                className={cn('transition-all duration-300', mobileOpen ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4')}
+                className={cn(
+                  'transition-all duration-300',
+                  mobileOpen ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'
+                )}
               >
                 <a
                   href={href}
-                  onClick={() => setMobileOpen(false)}
+                  onClick={() => {
+                    setActiveLink(href)
+                    setMobileOpen(false)
+                  }}
                   className={cn(
                     'flex items-center justify-between w-full py-3.5 text-base font-medium border-b border-[var(--border)] transition-colors',
-                    activeLink === href ? 'text-accent' : 'text-[var(--text-2)] hover:text-[var(--text)]'
+                    activeLink === href
+                      ? 'text-accent'
+                      : 'text-[var(--text-2)] hover:text-[var(--text)]'
                   )}
                 >
                   {label}
@@ -212,12 +225,15 @@ export function Navbar() {
             ))}
           </ul>
 
-          <div className={cn('transition-all duration-300 delay-300', mobileOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4')}>
+          <div className={cn(
+            'transition-all duration-300 delay-300',
+            mobileOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+          )}>
             <button
               onClick={() => { toggleCart(); setMobileOpen(false) }}
               className="w-full bg-accent text-black font-syne font-bold rounded-full py-4 text-sm hover:bg-[#5dcc8c] transition-colors"
             >
-              Ver mi protocolo {count > 0 && `(${count})`}
+              Ver mi protocolo{count > 0 && ` (${count})`}
             </button>
           </div>
         </nav>
